@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom — Wellness & Life Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Nunito:wght@300;400;500;600;700&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fefaf5;
+    --white: #ffffff;
+    --rose:    #f4b8c1;
+    --rose-light: #fde8eb;
+    --rose-deep: #e8879a;
+    --lavender: #c9b8e8;
+    --lavender-light: #ede8f9;
+    --mint:    #a8dbc9;
+    --mint-light: #dff4ec;
+    --peach:   #f9c9a0;
+    --peach-light: #feeedd;
+    --sky:     #a8cfe8;
+    --sky-light: #ddeef9;
+    --yellow:  #f7e4a0;
+    --yellow-light: #fdf5d8;
+    --ink:     #3a2e3a;
+    --ink-mid: #6b5b6b;
+    --ink-soft: #a895a8;
+    --border:  rgba(180,160,180,0.18);
+    --shadow:  0 4px 32px rgba(180,120,160,0.10);
+    --shadow-hover: 0 12px 48px rgba(180,120,160,0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='4' fill='%23f4b8c1' /%3E%3C/svg%3E") 10 10, auto;
+  }
+
+  /* SOFT BLOB BACKGROUND */
+  .bg-blobs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: float 18s ease-in-out infinite;
+    opacity: 0.55;
+  }
+
+  .blob-1 { width: 500px; height: 500px; background: var(--rose-light); top: -160px; right: -80px; animation-delay: 0s; }
+  .blob-2 { width: 400px; height: 400px; background: var(--lavender-light); bottom: 0; left: -100px; animation-delay: -7s; }
+  .blob-3 { width: 300px; height: 300px; background: var(--mint-light); top: 40%; left: 45%; animation-delay: -3s; }
+  .blob-4 { width: 250px; height: 250px; background: var(--peach-light); top: 20%; left: 20%; animation-delay: -11s; }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -30px) scale(1.04); }
+    66% { transform: translate(-15px, 20px) scale(0.97); }
+  }
+
+  /* PATTERN OVERLAY */
+  .bg-dots {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: radial-gradient(circle, rgba(180,140,180,0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* WRAPPER */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(24px);
+    background: rgba(254,250,245,0.88);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--rose-deep);
+    letter-spacing: 1px;
+  }
+
+  .logo span { color: var(--lavender); }
+
+  .nav-tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 5px;
+  }
+
+  .nav-tab {
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: var(--ink-mid);
+    border: none;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .nav-tab.active {
+    background: white;
+    color: var(--ink);
+    box-shadow: 0 2px 16px rgba(180,120,160,0.15);
+  }
+
+  .nav-tab:hover:not(.active) { color: var(--ink); background: rgba(255,255,255,0.5); }
+
+  .nav-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 12px rgba(180,120,160,0.25);
+  }
+
+  .nav-avatar:hover { transform: scale(1.08); }
+
+  /* PAGES */
+  .page { display: none; padding: 48px 0 80px; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero { padding: 60px 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(44px, 5.5vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .hero-title em { font-style: italic; color: var(--rose-deep); }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--ink-mid);
+    line-height: 1.8;
+    margin-bottom: 36px;
+    font-weight: 300;
+    max-width: 400px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 6px 24px rgba(228,135,154,0.35);
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(228,135,154,0.45); }
+
+  /* HERO ILLUSTRATION — MOOD RING */
+  .hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .mood-ring-wrap { position: relative; width: 280px; height: 280px; }
+
+  .mood-ring {
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: conic-gradient(var(--rose-light), var(--lavender-light), var(--mint-light), var(--sky-light), var(--peach-light), var(--rose-light));
+    animation: spin 20s linear infinite;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 48px rgba(180,120,160,0.2);
+  }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .mood-ring-inner {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--cream);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .mood-emoji { font-size: 48px; animation: bounce 3s ease-in-out infinite; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .mood-label { font-size: 16px; font-style: italic; color: var(--ink-mid); }
+
+  .floating-pill {
+    position: absolute;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(180,120,160,0.15);
+    animation: float-pill 6s ease-in-out infinite;
+    white-space: nowrap;
+  }
+
+  .fp1 { top: 20px; right: -20px; color: var(--rose-deep); animation-delay: 0s; }
+  .fp2 { bottom: 40px; left: -20px; color: #7b9bd4; animation-delay: -2s; }
+  .fp3 { top: 50%; right: -40px; color: #6bab8a; animation-delay: -4s; }
+
+  @keyframes float-pill {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.3;
+    transition: all 0.4s;
+  }
+
+  .stat-card:nth-child(1)::after { background: var(--rose); }
+  .stat-card:nth-child(2)::after { background: var(--mint); }
+  .stat-card:nth-child(3)::after { background: var(--lavender); }
+  .stat-card:nth-child(4)::after { background: var(--peach); }
+
+  .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .stat-card:hover::after { transform: scale(1.4); opacity: 0.5; }
+
+  .stat-icon { font-size: 24px; margin-bottom: 12px; }
+  .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; margin-bottom: 8px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .stat-sub { font-size: 12px; color: var(--ink-soft); }
+
+  /* SECTION HEADING */
+  .sec-head {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .sec-head em { font-style: italic; color: var(--rose-deep); }
+  .sec-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 28px; }
+
+  /* MAIN GRID */
+  .main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+
+  /* HABIT TRACKER */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s;
+  }
+
+  .card:hover { box-shadow: var(--shadow-hover); }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .card-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 24px; }
+
+  /* HABIT ROWS */
+  .habit-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(180,160,180,0.1);
+  }
+
+  .habit-row:last-child { border-bottom: none; }
+
+  .habit-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .habit-info { flex: 1; }
+  .habit-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .habit-streak { font-size: 12px; color: var(--ink-soft); }
+
+  .habit-checks { display: flex; gap: 6px; }
+
+  .day-check {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s;
+    color: transparent;
+  }
+
+  .day-check.done { color: white; border-color: transparent; }
+  .day-check:hover:not(.done) { border-color: var(--rose); background: var(--rose-light); }
+
+  /* CALENDAR SIDEBAR */
+  .mini-cal { margin-bottom: 16px; }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .cal-month { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; }
+  .cal-btn { background: none; border: none; cursor: pointer; color: var(--ink-soft); font-size: 18px; padding: 4px 8px; border-radius: 8px; transition: all 0.2s; }
+  .cal-btn:hover { background: var(--rose-light); color: var(--rose-deep); }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+
+  .cal-header { font-size: 10px; font-weight: 700; color: var(--ink-soft); letter-spacing: 1px; padding: 4px 0; text-transform: uppercase; }
+
+  .cal-day {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0 auto;
+  }
+
+  .cal-day:hover:not(.empty):not(.today) { background: var(--rose-light); color: var(--rose-deep); }
+  .cal-day.today { background: linear-gradient(135deg, var(--rose), var(--lavender)); color: white; font-weight: 700; }
+  .cal-day.marked { background: var(--mint-light); color: #3a7a5a; font-weight: 600; }
+  .cal-day.empty { cursor: default; color: var(--border); }
+
+  /* MOOD LOG */
+  .mood-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+
+  .mood-btn {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    background: white;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-size: 24px;
+  }
+
+  .mood-btn span { font-size: 10px; font-weight: 700; color: var(--ink-soft); }
+  .mood-btn:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(180,120,160,0.2); }
+  .mood-btn.selected { border-color: var(--rose); background: var(--rose-light); transform: scale(1.08); }
+
+  /* JOURNAL / NOTES */
+  .journal-area {
+    width: 100%;
+    min-height: 140px;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.8;
+  }
+
+  .journal-area:focus { border-color: var(--lavender); }
+  .journal-area::placeholder { color: var(--ink-soft); font-style: italic; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  .tag {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .tag:hover { transform: scale(1.05); }
+
+  /* GOALS PAGE */
+  .goals-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .page-heading { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; }
+  .page-heading em { font-style: italic; color: var(--rose-deep); }
+
+  .goals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  .goal-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .goal-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+
+  .goal-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .goal-emoji { font-size: 36px; margin-bottom: 14px; margin-top: 10px; }
+  .goal-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+  .goal-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 20px; }
+
+  .progress-bar {
+    background: rgba(180,160,180,0.15);
+    border-radius: 8px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .progress-label { font-size: 12px; color: var(--ink-soft); display: flex; justify-content: space-between; }
+
+  /* ADD GOAL BTN */
+  .goal-card.add-card {
+    border: 2px dashed var(--border);
+    background: transparent;
+    box-shadow: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 200px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    gap: 10px;
+    transition: all 0.25s;
+  }
+
+  .goal-card.add-card:hover { border-color: var(--rose); color: var(--rose-deep); background: var(--rose-light); }
+  .add-icon { font-size: 32px; }
+
+  /* RECIPE/WELLNESS PAGE */
+  .wellness-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  .timer-circle {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--rose) var(--progress, 0%), rgba(180,160,180,0.15) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    transition: --progress 1s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .timer-inner {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: white;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+  }
+
+  .timer-num { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 600; color: var(--ink); }
+  .timer-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+
+  .timer-btns { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+
+  .btn-soft {
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+    color: var(--ink-mid);
+  }
+
+  .btn-soft:hover { background: var(--rose-light); border-color: var(--rose); color: var(--rose-deep); }
+
+  .btn-soft.active { background: linear-gradient(135deg, var(--rose), var(--lavender)); color: white; border-color: transparent; box-shadow: 0 4px 16px rgba(228,135,154,0.3); }
+
+  /* WATER TRACKER */
+  .water-cups { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; justify-content: center; }
+
+  .cup {
+    width: 40px; height: 50px;
+    border: 2px solid var(--sky);
+    border-radius: 0 0 8px 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    overflow: hidden;
+    position: relative;
+    background: white;
+  }
+
+  .cup.filled { background: linear-gradient(to top, var(--sky), var(--sky-light)); border-color: #6ba8cc; }
+  .cup:hover:not(.filled) { border-color: var(--sky); background: var(--sky-light); transform: scale(1.05); }
+  .cup::after { content: '💧'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 16px; opacity: 0; transition: opacity 0.2s; }
+  .cup.filled::after { opacity: 1; }
+
+  /* QUOTE CARD */
+  .quote-card {
+    background: linear-gradient(135deg, var(--lavender-light), var(--rose-light));
+    border-radius: 24px;
+    padding: 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quote-card::before {
+    content: '"';
+    position: absolute;
+    top: -20px; left: 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 160px;
+    color: rgba(228,135,154,0.12);
+    line-height: 1;
+  }
+
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .quote-author { font-size: 13px; color: var(--ink-soft); font-weight: 600; letter-spacing: 1px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px 20px;
+    font-size: 14px;
+    box-shadow: 0 16px 48px rgba(180,120,160,0.2);
+    z-index: 999;
+    transform: translateX(120%);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 280px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast-icon { font-size: 24px; }
+  .toast-title { font-weight: 700; color: var(--ink); font-size: 13px; }
+  .toast-msg { color: var(--ink-soft); font-size: 12px; margin-top: 2px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(58,46,58,0.35);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 40px;
+    width: 460px; max-width: 90vw;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 32px 80px rgba(180,120,160,0.25);
+  }
+
+  @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; }
+  .modal-close { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 20px; }
+  .modal-close:hover { color: var(--rose-deep); }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
+  .form-input {
+    width: 100%;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--rose); }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(16px); transition: all 0.5s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ANIMATE STAGGER */
+  .reveal:nth-child(1) { transition-delay: 0s; }
+  .reveal:nth-child(2) { transition-delay: 0.08s; }
+  .reveal:nth-child(3) { transition-delay: 0.16s; }
+  .reveal:nth-child(4) { transition-delay: 0.24s; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+    background: white;
+  }
+
+  @property --progress { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+</style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+<div class="bg-dots"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toast-icon">🌸</div>
+  <div>
+    <div class="toast-title" id="toast-title">Well done!</div>
+    <div class="toast-msg" id="toast-msg">Keep going.</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Add a Goal</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="wrapper nav-inner">
+    <div class="logo">bloom<span>.</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchPage('home', this)">Home</button>
+      <button class="nav-tab" onclick="switchPage('goals', this)">Goals</button>
+      <button class="nav-tab" onclick="switchPage('wellness', this)">Wellness</button>
+      <button class="nav-tab" onclick="switchPage('journal', this)">Journal</button>
+    </div>
+    <div class="nav-avatar" onclick="showToast('👋', 'Hello!', 'Welcome back, lovely.')">🌸</div>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+  <div class="wrapper">
+
+    <!-- HERO -->
+    <div class="hero reveal">
+      <div>
+        <div class="hero-eyebrow">🌷 Your Daily Sanctuary</div>
+        <h1 class="hero-title">Nurture your<br><em>best self</em>,<br>one day at a time.</h1>
+        <p class="hero-sub">Track habits, set intentions, log your mood — all wrapped in one gentle, beautiful space just for you.</p>
+        <button class="btn-primary" onclick="switchPage('goals', document.querySelectorAll('.nav-tab')[1])">
+          🌿 Start Today
+        </button>
+      </div>
+      <div class="hero-visual">
+        <div class="mood-ring-wrap">
+          <div class="mood-ring">
+            <div class="mood-ring-inner">
+              <div class="mood-emoji" id="hero-emoji">🌸</div>
+              <div class="mood-label" id="hero-mood-label">Blossoming</div>
+            </div>
+          </div>
+          <div class="floating-pill fp1">🔥 7-day streak!</div>
+          <div class="floating-pill fp2">💧 8 cups today</div>
+          <div class="floating-pill fp3">😴 8.2h sleep</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card reveal" onclick="switchPage('wellness', document.querySelectorAll('.nav-tab')[2])">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-label">Habit Streak</div>
+        <div class="stat-value" id="streak-val">7</div>
+        <div class="stat-sub">days in a row</div>
+      </div>
+      <div class="stat-card reveal" onclick="switchPage('journal', document.querySelectorAll('.nav-tab')[3])">
+        <div class="stat-icon">📖</div>
+        <div class="stat-label">Journal Entries</div>
+        <div class="stat-value" id="entries-val">12</div>
+        <div class="stat-sub">this month</div>
+      </div>
+      <div class="stat-card reveal" onclick="switchPage('goals', document.querySelectorAll('.nav-tab')[1])">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">Goals Active</div>
+        <div class="stat-value">5</div>
+        <div class="stat-sub">on track</div>
+      </div>
+      <div class="stat-card reveal" onclick="showToast('🧘', 'Mood Average', 'Your average mood this week is \'Content\'. Keep it up!')">
+        <div class="stat-icon">✨</div>
+        <div class="stat-label">Mood Average</div>
+        <div class="stat-value">😊</div>
+        <div class="stat-sub">Content this week</div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+      <div>
+        <!-- HABITS -->
+        <div class="card reveal" style="margin-bottom:24px">
+          <div class="card-title">Daily Habits</div>
+          <div class="card-sub">Click the circles to check off each day</div>
+          <div id="habit-list"></div>
+        </div>
+
+        <!-- MOOD LOG -->
+        <div class="card reveal">
+          <div class="card-title">How are you feeling?</div>
+          <div class="card-sub">Tap to log today's mood</div>
+          <div class="mood-grid" id="mood-grid"></div>
+        </div>
+      </div>
+
+      <div>
+        <!-- MINI CALENDAR -->
+        <div class="card reveal" style="margin-bottom:20px">
+          <div class="mini-cal">
+            <div class="cal-nav">
+              <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+              <div class="cal-month" id="cal-month">April 2026</div>
+              <button class="cal-btn" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+
+        <!-- QUOTE -->
+        <div class="quote-card reveal">
+          <div class="quote-text" id="quote-text">"Bloom where you are planted."</div>
+          <div class="quote-author" id="quote-author">— SAINT FRANCIS DE SALES</div>
+          <button class="btn-soft" style="margin-top:16px" onclick="nextQuote()">New Quote ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GOALS ===== -->
+<div class="page" id="page-goals">
+  <div class="wrapper">
+    <div class="goals-header reveal">
+      <div class="page-heading">My <em>Goals</em></div>
+      <button class="btn-primary" onclick="openAddGoal()">+ Add Goal</button>
+    </div>
+    <div class="goals-grid" id="goals-grid"></div>
+  </div>
+</div>
+
+<!-- ===== WELLNESS ===== -->
+<div class="page" id="page-wellness">
+  <div class="wrapper">
+    <div class="reveal" style="margin-bottom:36px">
+      <div class="page-heading">Wellness <em>Tools</em></div>
+      <div class="sec-sub">Small rituals, big impact. Take a moment for yourself.</div>
+    </div>
+    <div class="wellness-grid">
+      <!-- BREATHING TIMER -->
+      <div class="card reveal" style="text-align:center">
+        <div class="card-title">Breathing Timer</div>
+        <div class="card-sub">4-7-8 technique for calm</div>
+        <div class="timer-circle" id="timer-circle" onclick="toggleTimer()">
+          <div class="timer-inner">
+            <div class="timer-num" id="timer-num">4:00</div>
+            <div class="timer-label" id="timer-phase">Tap to Start</div>
+          </div>
+        </div>
+        <div class="timer-btns">
+          <button class="btn-soft" onclick="setTimer(4)">4 min</button>
+          <button class="btn-soft" onclick="setTimer(7)">7 min</button>
+          <button class="btn-soft" onclick="setTimer(10)">10 min</button>
+        </div>
+      </div>
+
+      <!-- WATER TRACKER -->
+      <div class="card reveal" style="text-align:center">
+        <div class="card-title">Hydration Tracker</div>
+        <div class="card-sub">Goal: 8 glasses of water today</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--sky);margin:8px 0" id="water-count">0</div>
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:8px">glasses today</div>
+        <div class="water-cups" id="water-cups"></div>
+        <button class="btn-soft" style="margin-top:16px" onclick="resetWater()">Reset</button>
+      </div>
+
+      <!-- SLEEP LOG -->
+      <div class="card reveal">
+        <div class="card-title">Sleep Log</div>
+        <div class="card-sub">Track your nightly rest</div>
+        <div class="form-group">
+          <label class="form-label">Bedtime</label>
+          <input class="form-input" type="time" id="bedtime" value="22:30" onchange="calcSleep()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Wake Time</label>
+          <input class="form-input" type="time" id="waketime" value="06:45" onchange="calcSleep()">
+        </div>
+        <div style="background:var(--mint-light);border-radius:16px;padding:20px;text-align:center;margin-top:8px">
+          <div style="font-size:12px;color:#3a7a5a;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px">Total Sleep</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:#2a5a3a" id="sleep-result">8h 15m</div>
+          <div style="font-size:12px;color:#6a9a7a;margin-top:4px" id="sleep-note">🌿 Excellent sleep!</div>
+        </div>
+      </div>
+
+      <!-- AFFIRMATIONS -->
+      <div class="card reveal" style="text-align:center">
+        <div class="card-title">Daily Affirmation</div>
+        <div class="card-sub">Repeat after me…</div>
+        <div style="background:linear-gradient(135deg,var(--peach-light),var(--yellow-light));border-radius:20px;padding:28px;margin:16px 0">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;font-weight:400;line-height:1.6;color:var(--ink)" id="affirmation-text">I am worthy of love and belonging.</div>
+        </div>
+        <button class="btn-primary" onclick="nextAffirmation()">Next Affirmation 🌻</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JOURNAL ===== -->
+<div class="page" id="page-journal">
+  <div class="wrapper">
+    <div class="reveal" style="margin-bottom:32px">
+      <div class="page-heading">My <em>Journal</em></div>
+      <div class="sec-sub">A private space to think, feel, and reflect.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px">
+      <div>
+        <div class="card reveal" style="margin-bottom:24px">
+          <div class="card-title" id="journal-date">April 2, 2026</div>
+          <div class="card-sub">What's on your mind today?</div>
+          <textarea class="journal-area" id="journal-input" placeholder="Start writing… this space belongs to you. 🌸" oninput="autoSave()"></textarea>
+          <div class="tag-row" id="tag-row"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+            <div style="font-size:12px;color:var(--ink-soft)" id="save-status">Ready to write</div>
+            <button class="btn-primary" onclick="saveEntry()">Save Entry 💾</button>
+          </div>
+        </div>
+
+        <!-- PAST ENTRIES -->
+        <div class="card reveal">
+          <div class="card-title">Past Entries</div>
+          <div id="past-entries"></div>
+        </div>
+      </div>
+
+      <!-- PROMPTS SIDEBAR -->
+      <div>
+        <div class="card reveal" style="margin-bottom:20px">
+          <div class="card-title">Writing Prompts</div>
+          <div class="card-sub">Tap any prompt to use it</div>
+          <div id="prompts-list"></div>
+        </div>
+
+        <div class="card reveal" style="text-align:center">
+          <div style="font-size:36px;margin-bottom:12px" id="gratitude-emoji">🌼</div>
+          <div class="card-title">Gratitude</div>
+          <div class="card-sub">What are you grateful for today?</div>
+          <div id="gratitude-items"></div>
+          <button class="btn-soft" style="margin-top:12px;width:100%" onclick="addGratitude()">+ Add Gratitude</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrapper">
+    <div class="logo" style="font-size:24px;margin-bottom:8px">bloom<span>.</span></div>
+    <div>Made with 🌸 for your wellbeing · Take care of yourself today</div>
+  </div>
+</footer>
+
+<script>
+// ===== DATA =====
+const habits = [
+  { name: 'Morning Stretch', streak: 7, icon: '🧘', color: '#f9c9a0', bg: '#feeedd' },
+  { name: 'Read 20 Minutes', streak: 5, icon: '📚', color: '#c9b8e8', bg: '#ede8f9' },
+  { name: 'Drink 8 Glasses', streak: 12, icon: '💧', color: '#a8cfe8', bg: '#ddeef9' },
+  { name: 'Gratitude Log',   streak: 3, icon: '✨', color: '#a8dbc9', bg: '#dff4ec' },
+  { name: 'Digital Detox',   streak: 1, icon: '📵', color: '#f4b8c1', bg: '#fde8eb' },
+];
+
+const moods = [
+  { emoji: '😄', label: 'Joyful', color: '#f7e4a0' },
+  { emoji: '😊', label: 'Happy', color: '#a8dbc9' },
+  { emoji: '😌', label: 'Calm', color: '#c9b8e8' },
+  { emoji: '😐', label: 'Neutral', color: '#ddd' },
+  { emoji: '😔', label: 'Sad', color: '#a8cfe8' },
+];
+
+const quotes = [
+  { text: "Bloom where you are planted.", author: "SAINT FRANCIS DE SALES" },
+  { text: "She believed she could, so she did.", author: "R.S. GREY" },
+  { text: "You are enough, a thousand times enough.", author: "ATTICUS" },
+  { text: "Be gentle with yourself. You are a child of the universe.", author: "MAX EHRMANN" },
+  { text: "The way you speak to yourself matters most.", author: "UNKNOWN" },
+  { text: "Small steps are still steps forward.", author: "UNKNOWN" },
+];
+
+const affirmations = [
+  "I am worthy of love and belonging.",
+  "I choose peace, joy, and growth today.",
+  "I trust the journey, even when I don't understand it.",
+  "My potential is limitless.",
+  "I am becoming the best version of myself.",
+  "I release what no longer serves me.",
+  "My feelings are valid and important.",
+  "Today I will focus on what I can control.",
+];
+
+const promptsList = [
+  "What made you smile today? 😊",
+  "Describe a moment of peace you had recently.",
+  "What would you tell your past self?",
+  "What are three things you're proud of?",
+  "How do you want to feel tomorrow?",
+  "What's one thing you'd like to let go of?",
+  "Who inspires you and why?",
+];
+
+const goalsData = [
+  { emoji: '🏃', title: 'Run 5K', desc: 'Train for a 5km fun run by June.', color: '#f4b8c1', progress: 68 },
+  { emoji: '📚', title: 'Read 24 Books', desc: '2 books a month for the year.', color: '#c9b8e8', progress: 33 },
+  { emoji: '🌿', title: 'Daily Meditation', desc: '10 minutes every morning.', color: '#a8dbc9', progress: 80 },
+  { emoji: '💰', title: 'Save $5,000', desc: 'Emergency fund goal by December.', color: '#f9c9a0', progress: 52 },
+  { emoji: '✍️', title: 'Write Daily', desc: 'Journal at least 3 sentences a day.', color: '#a8cfe8', progress: 91 },
+];
+
+let habitChecks = {};
+habits.forEach((h, i) => {
+  habitChecks[i] = [true, true, true, false, false, false, false];
+});
+
+let selectedMood = null;
+let quoteIdx = 0;
+let affIdx = 0;
+let waterCount = 0;
+let timerRunning = false;
+let timerInterval = null;
+let timerSecs = 240;
+let totalSecs = 240;
+let calYear = 2026, calMonth = 3; // 0-indexed: 3=April
+let markedDays = new Set([1,3,5,8,12,15,18,22]);
+let gratitudeList = ['A cozy morning', 'My health', 'Kind friends'];
+let pastEntries = [
+  { date: 'April 1, 2026', preview: 'Started the month feeling hopeful…', mood: '😊' },
+  { date: 'March 31, 2026', preview: 'Reflected on the past month, lots of growth…', mood: '😌' },
+];
+let saveTimeout;
+let userGoals = [...goalsData];
+
+// ===== HABITS =====
+function buildHabits() {
+  const days = ['M','T','W','T','F','S','S'];
+  document.getElementById('habit-list').innerHTML = habits.map((h, i) => `
+    <div class="habit-row">
+      <div class="habit-icon" style="background:${h.bg};">${h.icon}</div>
+      <div class="habit-info">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-streak">🔥 ${h.streak}-day streak</div>
+      </div>
+      <div class="habit-checks">
+        ${days.map((d, j) => `
+          <button class="day-check ${habitChecks[i][j] ? 'done' : ''}"
+            style="${habitChecks[i][j] ? `background:${h.color};border-color:${h.color};` : ''}"
+            onclick="toggleHabit(${i},${j})" title="${d}">${habitChecks[i][j] ? '✓' : ''}</button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleHabit(hi, di) {
+  habitChecks[hi][di] = !habitChecks[hi][di];
+  if (habitChecks[hi][di]) {
+    habits[hi].streak++;
+    showToast(habits[hi].icon, 'Habit checked!', `${habits[hi].name} — keep it up! 🎉`);
+  } else {
+    habits[hi].streak = Math.max(0, habits[hi].streak - 1);
+  }
+  buildHabits();
+  updateStreak();
+}
+
+function updateStreak() {
+  const s = Math.max(...habits.map(h => h.streak));
+  document.getElementById('streak-val').textContent = s;
+}
+
+// ===== MOOD =====
+function buildMoods() {
+  document.getElementById('mood-grid').innerHTML = moods.map((m, i) => `
+    <button class="mood-btn ${selectedMood === i ? 'selected' : ''}" onclick="selectMood(${i})">
+      ${m.emoji}<span>${m.label}</span>
+    </button>
+  `).join('');
+}
+
+function selectMood(i) {
+  selectedMood = i;
+  buildMoods();
+  const m = moods[i];
+  document.getElementById('hero-emoji').textContent = m.emoji;
+  document.getElementById('hero-mood-label').textContent = m.label;
+  showToast(m.emoji, `Feeling ${m.label}`, 'Mood logged for today 💕');
+}
+
+// ===== CALENDAR =====
+function buildCalendar() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month').textContent = `${months[calMonth]} ${calYear}`;
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
+
+  let html = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = isCurrentMonth && d === today.getDate();
+    const isMarked = markedDays.has(d) && isCurrentMonth;
+    html += `<div class="cal-day ${isToday ? 'today' : isMarked ? 'marked' : ''}"
+      onclick="clickDay(${d})">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  buildCalendar();
+}
+
+function clickDay(d) {
+  if (markedDays.has(d)) markedDays.delete(d);
+  else { markedDays.add(d); showToast('📅', 'Day marked', `${d} is now highlighted on your calendar.`); }
+  buildCalendar();
+}
+
+// ===== QUOTES =====
+function nextQuote() {
+  quoteIdx = (quoteIdx + 1) % quotes.length;
+  document.getElementById('quote-text').textContent = `"${quotes[quoteIdx].text}"`;
+  document.getElementById('quote-author').textContent = `— ${quotes[quoteIdx].author}`;
+}
+
+// ===== GOALS =====
+function buildGoals() {
+  const grid = document.getElementById('goals-grid');
+  grid.innerHTML = userGoals.map((g, i) => `
+    <div class="goal-card reveal" onclick="bumpGoal(${i})">
+      <div class="goal-accent" style="background:linear-gradient(135deg,${g.color},#fff)"></div>
+      <div class="goal-emoji">${g.emoji}</div>
+      <div class="goal-title">${g.title}</div>
+      <div class="goal-desc">${g.desc}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${g.progress}%;background:${g.color}"></div></div>
+      <div class="progress-label"><span>Progress</span><span>${g.progress}%</span></div>
+    </div>
+  `).join('') + `
+    <div class="goal-card add-card" onclick="openAddGoal()">
+      <div class="add-icon">+</div>
+      <div>Add New Goal</div>
+    </div>
+  `;
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+function bumpGoal(i) {
+  if (userGoals[i].progress < 100) {
+    userGoals[i].progress = Math.min(100, userGoals[i].progress + 5);
+    buildGoals();
+    showToast(userGoals[i].emoji, 'Progress!', `${userGoals[i].title}: ${userGoals[i].progress}% complete!`);
+  } else {
+    showToast('🎉', 'Goal Complete!', `You've achieved: ${userGoals[i].title}!`);
+  }
+}
+
+function openAddGoal() {
+  document.getElementById('modal-title').textContent = 'Add a New Goal';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Goal Title</label>
+      <input class="form-input" id="new-goal-title" placeholder="e.g. Run a marathon">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="new-goal-desc" placeholder="Describe your goal…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose an Emoji</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px" id="emoji-picker">
+        ${['🏃','📚','🌿','💰','✍️','🎨','🧘','💪','🎵','✈️','🍎','🧠'].map(e => `
+          <span onclick="pickEmoji('${e}')" style="font-size:24px;cursor:pointer;padding:8px;border-radius:10px;transition:all 0.2s" 
+            class="ep" id="ep-${e}">${e}</span>
+        `).join('')}
+      </div>
+    </div>
+    <button class="btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="saveNewGoal()">Add Goal 🌟</button>
+  `;
+  window.chosenEmoji = '🏃';
+  document.getElementById('modal').classList.add('open');
+}
+
+function pickEmoji(e) {
+  window.chosenEmoji = e;
+  document.querySelectorAll('.ep').forEach(el => el.style.background = '');
+  document.getElementById(`ep-${e}`).style.background = 'var(--rose-light)';
+}
+
+function saveNewGoal() {
+  const title = document.getElementById('new-goal-title').value.trim();
+  const desc = document.getElementById('new-goal-desc').value.trim();
+  if (!title) return;
+  const colors = ['#f4b8c1','#c9b8e8','#a8dbc9','#f9c9a0','#a8cfe8','#f7e4a0'];
+  userGoals.push({ emoji: window.chosenEmoji || '🌟', title, desc: desc || 'My new goal.', color: colors[userGoals.length % colors.length], progress: 0 });
+  buildGoals();
+  closeModal();
+  showToast('🌟', 'Goal Added!', `"${title}" is now on your board.`);
+}
+
+// ===== TIMER =====
+function setTimer(min) {
+  clearInterval(timerInterval); timerRunning = false;
+  timerSecs = totalSecs = min * 60;
+  updateTimerDisplay();
+  document.getElementById('timer-phase').textContent = 'Tap to Start';
+  document.getElementById('timer-circle').style.setProperty('--progress', '0%');
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timer-phase').textContent = 'Paused';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-phase').textContent = 'Breathe…';
+    timerInterval = setInterval(() => {
+      timerSecs--;
+      if (timerSecs <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        timerSecs = totalSecs;
+        document.getElementById('timer-phase').textContent = 'Complete ✓';
+        showToast('🧘', 'Session complete!', 'You did great. Take a deep breath. 🌿');
+      }
+      updateTimerDisplay();
+      const pct = ((totalSecs - timerSecs) / totalSecs * 100).toFixed(1);
+      document.getElementById('timer-circle').style.background = 
+        `conic-gradient(var(--rose) ${pct}%, rgba(180,160,180,0.15) 0%)`;
+    }, 1000);
+  }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSecs / 60), s = timerSecs % 60;
+  document.getElementById('timer-num').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ===== WATER =====
+function buildWater() {
+  document.getElementById('water-cups').innerHTML = Array.from({length: 8}, (_, i) => `
+    <div class="cup ${i < waterCount ? 'filled' : ''}" onclick="drinkWater(${i})"></div>
+  `).join('');
+  document.getElementById('water-count').textContent = waterCount;
+}
+
+function drinkWater(i) {
+  waterCount = i + 1;
+  buildWater();
+  if (waterCount === 8) showToast('💧', 'Hydration Goal Met!', 'You drank all 8 glasses! Amazing! 🎉');
+  else showToast('💧', `${waterCount}/8 glasses`, 'Keep hydrating!');
+}
+
+function resetWater() { waterCount = 0; buildWater(); }
+
+// ===== SLEEP =====
+function calcSleep() {
+  const bed = document.getElementById('bedtime').value;
+  const wake = document.getElementById('waketime').value;
+  if (!bed || !wake) return;
+  const [bh, bm] = bed.split(':').map(Number);
+  const [wh, wm] = wake.split(':').map(Number);
+  let mins = (wh * 60 + wm) - (bh * 60 + bm);
+  if (mins < 0) mins += 24 * 60;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  document.getElementById('sleep-result').textContent = `${h}h ${m}m`;
+  let note = '';
+  if (h >= 8) note = '🌿 Excellent sleep!';
+  else if (h >= 7) note = '😊 Good sleep!';
+  else if (h >= 6) note = '😐 Could be more.';
+  else note = '😴 Try to sleep more.';
+  document.getElementById('sleep-note').textContent = note;
+}
+
+// ===== AFFIRMATIONS =====
+function nextAffirmation() {
+  affIdx = (affIdx + 1) % affirmations.length;
+  document.getElementById('affirmation-text').textContent = affirmations[affIdx];
+  showToast('✨', 'New Affirmation', 'Say it with conviction!');
+}
+
+// ===== JOURNAL =====
+function buildJournal() {
+  const tags = ['🌸 Grateful', '💪 Motivated', '😌 Peaceful', '🌧 Hard Day', '💡 Inspired', '❤️ Loved'];
+  document.getElementById('tag-row').innerHTML = tags.map(t => `
+    <button class="tag" style="background:var(--rose-light);color:var(--rose-deep)" onclick="insertTag('${t}')">${t}</button>
+  `).join('');
+
+  document.getElementById('prompts-list').innerHTML = promptsList.map(p => `
+    <div style="padding:12px;border-radius:12px;cursor:pointer;transition:all 0.2s;font-size:13px;color:var(--ink-mid);border:1px solid var(--border);margin-bottom:8px"
+      onmouseover="this.style.background='var(--rose-light)';this.style.color='var(--rose-deep)'"
+      onmouseout="this.style.background='';this.style.color='var(--ink-mid)'"
+      onclick="usePrompt('${p.replace(/'/g,"\\'")}')">
+      ${p}
+    </div>
+  `).join('');
+
+  buildGratitude();
+  buildPastEntries();
+}
+
+function insertTag(t) {
+  const el = document.getElementById('journal-input');
+  el.value += (el.value ? '\n' : '') + t + ' ';
+  el.focus();
+}
+
+function usePrompt(p) {
+  const el = document.getElementById('journal-input');
+  el.value = p + '\n\n';
+  el.focus();
+  showToast('✍️', 'Prompt added!', 'Start writing your response…');
+}
+
+function autoSave() {
+  document.getElementById('save-status').textContent = 'Unsaved changes…';
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    document.getElementById('save-status').textContent = '✓ Auto-saved';
+  }, 1500);
+}
+
+function saveEntry() {
+  const text = document.getElementById('journal-input').value.trim();
+  if (!text) return;
+  const today = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+  pastEntries.unshift({ date: today, preview: text.slice(0, 60) + '…', mood: moods[selectedMood]?.emoji || '📖' });
+  document.getElementById('journal-input').value = '';
+  document.getElementById('save-status').textContent = 'Entry saved! ✓';
+  const ev = document.getElementById('entries-val');
+  ev.textContent = +ev.textContent + 1;
+  buildPastEntries();
+  showToast('📖', 'Entry saved!', 'Your thoughts are safely recorded. 💕');
+}
+
+function buildPastEntries() {
+  document.getElementById('past-entries').innerHTML = pastEntries.slice(0,4).map(e => `
+    <div style="padding:16px;border-radius:14px;border:1px solid var(--border);margin-bottom:10px;cursor:pointer;transition:all 0.2s"
+      onmouseover="this.style.background='var(--lavender-light)'" onmouseout="this.style.background=''">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:700;color:var(--ink-soft)">${e.date}</span>
+        <span>${e.mood}</span>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);font-style:italic">${e.preview}</div>
+    </div>
+  `).join('');
+}
+
+function buildGratitude() {
+  document.getElementById('gratitude-items').innerHTML = gratitudeList.map((g,i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;background:var(--yellow-light);margin-bottom:8px;font-size:13px">
+      <span>🙏</span><span style="flex:1">${g}</span>
+      <span onclick="removeGratitude(${i})" style="cursor:pointer;color:var(--ink-soft);font-size:11px">✕</span>
+    </div>
+  `).join('');
+}
+
+function addGratitude() {
+  openModal('Add Gratitude', `
+    <div class="form-group">
+      <label class="form-label">What are you grateful for?</label>
+      <input class="form-input" id="grat-input" placeholder="e.g. A sunny morning…" autofocus>
+    </div>
+    <button class="btn-primary" style="width:100%;justify-content:center" onclick="saveGratitude()">Add 🙏</button>
+  `);
+}
+
+function saveGratitude() {
+  const v = document.getElementById('grat-input').value.trim();
+  if (!v) return;
+  gratitudeList.push(v);
+  buildGratitude();
+  closeModal();
+  showToast('🙏', 'Gratitude added!', `"${v}" added to your list.`);
+}
+
+function removeGratitude(i) { gratitudeList.splice(i, 1); buildGratitude(); }
+
+// ===== MODAL =====
+function openModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(icon, title, msg) {
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast').classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => document.getElementById('toast').classList.remove('show'), 3200);
+}
+
+// ===== PAGE SWITCH =====
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.05 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== INIT =====
+buildHabits();
+buildMoods();
+buildCalendar();
+buildGoals();
+buildWater();
+buildJournal();
+calcSleep();
+setTimer(4);
+document.getElementById('journal-date').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+</script>
+</body>
+</html>
